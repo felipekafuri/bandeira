@@ -11,48 +11,51 @@
 
 <img width="2550" height="927" alt="Screenshot 2026-02-18 at 11 43 58" src="https://github.com/user-attachments/assets/ba553a72-1edf-4d9b-954c-058235e0c0bb" />
 
-
 Self-hosted, open-source feature flag service built with Go. Ships as a single binary + SQLite.
 
 **Bandeira** — Portuguese for "flag."
 
+> **Documentation**: [bandeira.app/docs](https://bandeira.app/docs) — SDK guides, API reference, strategy playground, and more.
+
 ## Features
 
+- **Real-time updates (SSE)** — flag changes push instantly to connected SDKs via Server-Sent Events, no polling delay
 - **Kill switches** — disable features in production without redeploying
 - **Gradual rollouts** — roll features out to a % of users or specific groups
 - **Environment toggles** — enable in staging, disable in production
-- **Multi-project** — one Bandeira instance serves all projects
+- **Multi-project** — one Bandeira instance serves all your projects
 - **Multi-user RBAC** — admin, editor, and viewer roles with email/password auth
 - **Admin dashboard** — React UI with matrix toggle view
-- **Admin API** — 18 JSON endpoints for CI/CD, Terraform, and scripts
-- **Client API** — lightweight SDK endpoint for flag evaluation
+- **Admin API** — JSON endpoints for CI/CD, Terraform, and scripts
+- **Client API** — lightweight SDK endpoint for flag evaluation + SSE streaming
+- **6 official SDKs** — Go, JS/TS, Python, PHP, Dart/Flutter, Elixir
 
 ## Architecture
 
 ```
-+---------------------------------------------+
-|                  Bandeira                    |
-|                                             |
-|  +----------+  +----------+  +-----------+  |
-|  | Admin UI |  | Admin API|  | Client API|  |
-|  | (React/  |  | (18 CRUD |  | (GET      |  |
-|  | Inertia) |  | endpoints|  | /api/v1/  |  |
-|  |          |  |          |  | flags)    |  |
-|  +----+-----+  +----+-----+  +-----+-----+  |
-|       |              |              |        |
-|       +--------------+--------------+        |
-|                      |                       |
-|              +-------v--------+              |
-|              |   Ent ORM      |              |
-|              |   (SQLite)     |              |
-|              +----------------+              |
-+---------------------------------------------+
-        |                          ^
-        |  polls every N seconds   |
-        v                          |
++---------------------------------------------------+
+|                     Bandeira                       |
+|                                                    |
+|  +----------+  +----------+  +---------+--------+  |
+|  | Admin UI |  | Admin API|  | Client API       |  |
+|  | (React/  |  | (CRUD    |  | GET /api/v1/flags|  |
+|  | Inertia) |  | endpoints|  | SSE /api/v1/stream| |
+|  +----+-----+  +----+-----+  +----+----+--------+  |
+|       |              |             |    |           |
+|       +--------------+-------------+----+           |
+|                      |                              |
+|              +-------v--------+                     |
+|              |   Ent ORM      |                     |
+|              |   (SQLite)     |                     |
+|              +----------------+                     |
++---------------------------------------------------+
+        |                          |
+        |  polls / SSE stream      |
+        v                          v
 +--------+--------+--------+--------+--------+--------+
 |   Go   | JS/TS  | Python |  PHP   |  Dart  | Elixir |
 +--------+--------+--------+--------+--------+--------+
+  SSE ✓    SSE ✓    SSE ✓    Poll     SSE ✓    SSE ✓
 ```
 
 Single Go binary. No Redis, no background workers, no message queue. SQLite is the only dependency.
@@ -91,42 +94,6 @@ The dashboard is available at `http://localhost:8080`. Log in with the admin ema
 
 Bandeira is available in the [Coolify](https://coolify.io) service store for one-click deployment.
 
-### SDKs
-
-Official client SDKs poll the server, cache flags locally, and evaluate strategies in-process.
-
-| Language | Install | Package |
-|----------|---------|---------|
-| Go | `go get github.com/felipekafuri/bandeira-sdks/go` | [bandeira-sdks/go](https://github.com/felipekafuri/bandeira-sdks) |
-| JS/TS | `npm install bandeira` | [npm](https://www.npmjs.com/package/bandeira) |
-| Python | `pip install bandeira` | [PyPI](https://pypi.org/project/bandeira/) |
-| PHP | [See install instructions](https://github.com/felipekafuri/bandeira-sdks/tree/main/php#install) | [bandeira-sdks/php](https://github.com/felipekafuri/bandeira-sdks) |
-| Dart/Flutter | `dart pub add bandeira` | [pub.dev](https://pub.dev/packages/bandeira) |
-| Elixir | `{:bandeira, "~> 0.1.0"}` | [hex.pm](https://hex.pm/packages/bandeira) |
-
-```go
-// Go
-client, _ := bandeira.New(bandeira.Config{URL: "http://localhost:8080", Token: "your-token"})
-defer client.Close()
-client.IsEnabled("my-feature", bandeira.Context{UserID: "user-123"})
-```
-
-```typescript
-// JavaScript / TypeScript
-const client = new BandeiraClient({ url: "http://localhost:8080", token: "your-token" });
-await client.start();
-client.isEnabled("my-feature", { userId: "user-123" });
-```
-
-```python
-# Python
-client = BandeiraClient(Config(url="http://localhost:8080", token="your-token"))
-client.start()
-client.is_enabled("my-feature", Context(user_id="user-123"))
-```
-
-See the [SDKs repository](https://github.com/felipekafuri/bandeira-sdks) for full documentation.
-
 ### From source
 
 ```bash
@@ -148,6 +115,54 @@ make test      # Run all tests
 make ent-gen   # Regenerate Ent code after schema changes
 ```
 
+## SDKs
+
+Official client SDKs cache flags locally and evaluate strategies in-process. All SDKs (except PHP) support **real-time streaming via SSE** — flag changes are pushed instantly instead of waiting for the next poll interval.
+
+| Language | Install | SSE Streaming | Package |
+|----------|---------|:---:|---------|
+| Go | `go get github.com/felipekafuri/bandeira-sdks/go` | Yes | [bandeira-sdks/go](https://github.com/felipekafuri/bandeira-sdks) |
+| JS/TS | `npm install bandeira` | Yes | [npm](https://www.npmjs.com/package/bandeira) |
+| Python | `pip install bandeira` | Yes | [PyPI](https://pypi.org/project/bandeira/) |
+| PHP | [See install instructions](https://github.com/felipekafuri/bandeira-sdks/tree/main/php#install) | Poll | [bandeira-sdks/php](https://github.com/felipekafuri/bandeira-sdks) |
+| Dart/Flutter | `dart pub add bandeira` | Yes | [pub.dev](https://pub.dev/packages/bandeira) |
+| Elixir | `{:bandeira, "~> 0.2.0"}` | Yes | [hex.pm](https://hex.pm/packages/bandeira) |
+
+```go
+// Go — with real-time streaming
+client, _ := bandeira.New(bandeira.Config{
+    URL:       "http://localhost:8080",
+    Token:     "your-token",
+    Streaming: true,
+})
+defer client.Close()
+client.IsEnabled("my-feature", bandeira.Context{UserID: "user-123"})
+```
+
+```typescript
+// JavaScript / TypeScript — with real-time streaming
+const client = new BandeiraClient({
+  url: "http://localhost:8080",
+  token: "your-token",
+  streaming: true,
+});
+await client.start();
+client.isEnabled("my-feature", { userId: "user-123" });
+```
+
+```python
+# Python — with real-time streaming
+client = BandeiraClient(Config(
+    url="http://localhost:8080",
+    token="your-token",
+    streaming=True,
+))
+client.start()
+client.is_enabled("my-feature", Context(user_id="user-123"))
+```
+
+See the [SDKs repository](https://github.com/felipekafuri/bandeira-sdks) for full documentation.
+
 ## Configuration
 
 All settings live in `config/config.yaml` and can be overridden via environment variables with the `BANDEIRA_` prefix.
@@ -165,222 +180,29 @@ The admin email and password are only used to **seed the first user** on initial
 
 ## API Reference
 
-Bandeira exposes two API surfaces:
+Bandeira exposes two API surfaces, both requiring a `Bearer` token:
 
-- **Client API** — read-only flag data for SDKs (`/api/v1/`)
-- **Admin API** — full CRUD for managing projects, flags, environments, and tokens (`/api/admin/`)
+- **Client API** (`/api/v1/`) — read-only flag data for SDKs, plus SSE streaming
+- **Admin API** (`/api/admin/`) — full CRUD for managing projects, flags, environments, and tokens
 
-Both require a `Bearer` token in the `Authorization` header.
+| Endpoint | Auth | Description |
+|----------|------|-------------|
+| `GET /api/v1/flags` | Client token | Get all flags for the token's project + environment |
+| `GET /api/v1/stream` | Client token | SSE stream — real-time flag updates |
+| `/api/admin/projects/...` | Admin token | Manage projects |
+| `/api/admin/.../environments/...` | Admin token | Manage environments |
+| `/api/admin/.../flags/...` | Admin token | Manage flags and strategies |
+| `/api/admin/api-tokens/...` | Admin token | Manage API tokens |
 
----
-
-### Client API
-
-Used by SDKs. Requires a **client** token (scoped to one project + one environment).
-
-#### `GET /api/v1/flags`
-
-Returns all flags for the token's project and environment, with strategies and constraints.
-
-**Response:**
-
-```json
-{
-  "flags": [
-    {
-      "name": "new-dashboard",
-      "enabled": true,
-      "strategies": [
-        {
-          "name": "gradualRollout",
-          "parameters": { "rollout": 50, "stickiness": "userId" },
-          "constraints": [
-            {
-              "context_name": "companyId",
-              "operator": "IN",
-              "values": ["1", "2", "3"],
-              "inverted": false,
-              "case_insensitive": false
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Evaluation logic (performed by SDK, not server):**
-
-1. If `enabled` is `false` — flag is OFF, skip strategies
-2. If `enabled` is `true` and no strategies — flag is ON for everyone
-3. If `enabled` is `true` with strategies — evaluate each in order; if ANY returns true the flag is ON (OR between strategies, AND between constraints)
-
----
-
-### Admin API
-
-Used by CI/CD, Terraform, scripts, or the dashboard. Requires an **admin** token (scoped to one project).
-
-All responses use JSON. Timestamps are RFC 3339.
-
-#### Projects
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/projects` | List projects (returns only the token's project) |
-| `POST` | `/api/admin/projects` | Returns `403` — admin tokens are project-scoped |
-| `GET` | `/api/admin/projects/:id` | Get project with flag/environment counts |
-| `PUT` | `/api/admin/projects/:id` | Update project name/description |
-| `DELETE` | `/api/admin/projects/:id` | Delete project and all children |
-
-**Example — update project:**
-
-```bash
-curl -X PUT http://localhost:8080/api/admin/projects/1 \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "my-project", "description": "Updated description"}'
-```
-
-#### Environments
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/projects/:id/environments` | List environments (ordered by sort_order) |
-| `POST` | `/api/admin/projects/:id/environments` | Create environment |
-| `PUT` | `/api/admin/projects/:id/environments/:envId` | Update environment |
-| `DELETE` | `/api/admin/projects/:id/environments/:envId` | Delete environment |
-
-**Create request body:**
-
-```json
-{
-  "name": "production",
-  "type": "production",
-  "sort_order": 3
-}
-```
-
-`type` must be one of: `development`, `staging`, `production`.
-
-#### Flags
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/projects/:id/flags` | List flags |
-| `POST` | `/api/admin/projects/:id/flags` | Create flag |
-| `GET` | `/api/admin/projects/:id/flags/:flagId` | Get flag with all environment configs, strategies, and constraints |
-| `PUT` | `/api/admin/projects/:id/flags/:flagId` | Update flag metadata |
-| `DELETE` | `/api/admin/projects/:id/flags/:flagId` | Delete flag |
-| `PATCH` | `/api/admin/projects/:id/flags/:flagId/environments/:envId` | Toggle flag and/or replace strategies |
-
-**Create request body:**
-
-```json
-{
-  "name": "new-feature",
-  "description": "Optional description",
-  "flag_type": "release"
-}
-```
-
-`flag_type` must be one of: `release`, `experiment`, `operational`, `kill_switch`.
-
-**PATCH flag/env** — both fields are optional (PATCH semantics):
-
-```json
-{
-  "enabled": true,
-  "strategies": [
-    {
-      "name": "gradualRollout",
-      "parameters": { "rollout": 50, "stickiness": "userId" },
-      "constraints": [
-        {
-          "context_name": "region",
-          "operator": "IN",
-          "values": ["us-east", "us-west"]
-        }
-      ]
-    }
-  ]
-}
-```
-
-When `strategies` is present, all existing strategies are replaced.
-
-#### API Tokens
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/api-tokens` | List tokens for the project |
-| `POST` | `/api/admin/api-tokens` | Create token (returns `raw_token` once) |
-| `DELETE` | `/api/admin/api-tokens/:id` | Revoke token |
-
-**Create request body:**
-
-```json
-{
-  "name": "ci-deploy",
-  "token_type": "admin"
-}
-```
-
-For client tokens, include `"environment": "production"` (required for client type).
-
-**Response includes `raw_token`** — save it, it is only shown once:
-
-```json
-{
-  "id": 5,
-  "name": "ci-deploy",
-  "token_type": "admin",
-  "environment": "",
-  "raw_token": "a1b2c3d4e5f6...",
-  "created_at": "2026-02-14T12:00:00Z"
-}
-```
-
----
-
-### Error Responses
-
-**401 Unauthorized** — missing or invalid token:
-
-```json
-{ "message": "Missing or invalid Authorization header" }
-```
-
-**403 Forbidden** — token cannot access this resource:
-
-```json
-{ "error": "Forbidden" }
-```
-
-**422 Validation failed** — invalid input:
-
-```json
-{
-  "error": "Validation failed",
-  "fields": {
-    "name": "Name is required",
-    "type": "Type must be one of: development, staging, production"
-  }
-}
-```
-
----
+For full API documentation with request/response examples, see [bandeira.app/docs](https://bandeira.app/docs).
 
 ### Authentication
 
-- **Client tokens**: scoped to one project + one environment. Can only read flags via `GET /api/v1/flags`.
-- **Admin tokens**: scoped to one project. Full CRUD on that project's resources via `/api/admin/`.
+- **Client tokens**: scoped to one project + one environment. Can read flags and connect to the SSE stream.
+- **Admin tokens**: scoped to one project. Full CRUD on that project's resources.
 - **Dashboard auth**: session-based, email + password. Users are managed from the dashboard.
 
 ### User Roles
-
-The dashboard supports three roles:
 
 | Role | Dashboard | Flags/Projects/Envs | User Management |
 |------|-----------|---------------------|-----------------|
@@ -389,8 +211,6 @@ The dashboard supports three roles:
 | **Viewer** | Read-only | View only | No access |
 
 The first admin user is seeded on startup from `BANDEIRA_AUTH_ADMINEMAIL` and `BANDEIRA_AUTH_ADMINPASSWORD`. Additional users are created by admins from the `/users` page.
-
-**Upgrading from single-password auth:** Existing deployments that only have `BANDEIRA_AUTH_ADMINPASSWORD` set will automatically get an admin user with email `admin@bandeira.local` on first upgrade. Log in with that email and your existing password.
 
 ## Strategy Reference
 
