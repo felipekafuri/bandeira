@@ -1,4 +1,4 @@
-import { useForm, Link } from "@inertiajs/react";
+import { Head, useForm, Link } from "@inertiajs/react";
 import { FormEventHandler, useRef, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { SharedProps } from "@/types/global";
@@ -42,8 +42,10 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Toaster />
+    <>
+      <Head title="Login" />
+      <div className="min-h-screen flex flex-col bg-background">
+        <Toaster />
 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
@@ -151,6 +153,7 @@ export default function Login() {
           </p>
         </div>
       </main>
-    </div>
+      </div>
+    </>
   );
 }

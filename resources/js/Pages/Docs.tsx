@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 
 import PublicLayout from "@/Layouts/PublicLayout";
 
@@ -80,8 +80,10 @@ function SdkSection({
 
 export default function Docs() {
   return (
-    <PublicLayout activePage="docs">
-      <div className="py-8 px-4 md:px-6">
+    <>
+      <Head title="Documentation" />
+      <PublicLayout activePage="docs">
+        <div className="py-8 px-4 md:px-6">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
@@ -650,6 +652,7 @@ echo "Flag enabled in production"`}
           </div>
         </div>
       </div>
-    </PublicLayout>
+      </PublicLayout>
+    </>
   );
 }

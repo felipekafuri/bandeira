@@ -1,4 +1,4 @@
-import { Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, usePage, router } from "@inertiajs/react";
 import { useState } from "react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
@@ -51,10 +51,12 @@ export default function Index() {
   };
 
   return (
-    <TerminalLayout activePage="projects">
-      <div className="max-w-5xl">
-          <div className="mb-6">
-            <Link
+    <>
+      <Head title="API Tokens" />
+      <TerminalLayout activePage="projects">
+        <div className="max-w-5xl">
+            <div className="mb-6">
+              <Link
               href="/projects"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -183,6 +185,7 @@ export default function Index() {
             )}
           </div>
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

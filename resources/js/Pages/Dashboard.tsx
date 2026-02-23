@@ -1,4 +1,4 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
 
@@ -23,10 +23,12 @@ export default function Dashboard() {
     usePage<SharedProps & DashboardProps>().props;
 
   return (
-    <TerminalLayout activePage="dashboard">
-      <div className="max-w-5xl">
-        {/* Page heading */}
-        <div className="mb-8">
+    <>
+      <Head title="Dashboard" />
+      <TerminalLayout activePage="dashboard">
+        <div className="max-w-5xl">
+          {/* Page heading */}
+          <div className="mb-8">
           <h1 className="text-xl font-semibold text-foreground">
             {">"} dashboard
           </h1>
@@ -124,6 +126,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

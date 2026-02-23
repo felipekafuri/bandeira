@@ -1,4 +1,4 @@
-import { Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, usePage, router } from "@inertiajs/react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
 
@@ -30,10 +30,12 @@ export default function Index() {
   };
 
   return (
-    <TerminalLayout activePage="users">
-      <div className="max-w-5xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
+    <>
+      <Head title="Users" />
+      <TerminalLayout activePage="users">
+        <div className="max-w-5xl">
+          <div className="flex items-center justify-between mb-8">
+            <div>
             <h1 className="text-xl font-semibold text-foreground">
               {">"} users
             </h1>
@@ -111,6 +113,7 @@ export default function Index() {
           )}
         </div>
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

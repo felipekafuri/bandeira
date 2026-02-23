@@ -1,4 +1,4 @@
-import { Link, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { FormEventHandler, useState, useMemo } from "react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
@@ -74,9 +74,11 @@ export default function Edit() {
   }, []);
 
   return (
-    <TerminalLayout activePage="projects">
-      <div className="max-w-4xl">
-        <Link
+    <>
+      <Head title="Edit Flag" />
+      <TerminalLayout activePage="projects">
+        <div className="max-w-4xl">
+          <Link
           href={`/projects/${project.id}`}
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
@@ -236,6 +238,7 @@ export default function Edit() {
           )}
         </div>
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

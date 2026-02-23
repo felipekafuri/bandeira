@@ -1,3 +1,4 @@
+import { Head } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -264,8 +265,10 @@ export default function Brand() {
   const [promptCopied, setPromptCopied] = useState(false);
 
   return (
-    <PublicLayout activePage="brand">
-      {/* Hero */}
+    <>
+      <Head title="Brand" />
+      <PublicLayout activePage="brand">
+        {/* Hero */}
       <section className="py-16 px-4 md:px-6 bg-background border-b border-border">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-xl font-semibold tracking-tight text-foreground mb-2">
@@ -690,6 +693,7 @@ if (client.isEnabled("new-checkout")) {
           // bandeira — open source feature flag management
         </p>
       </footer>
-    </PublicLayout>
+      </PublicLayout>
+    </>
   );
 }

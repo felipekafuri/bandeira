@@ -3,12 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Bandeira is a self-hosted, open-source feature flag service. Ships as a single binary with SQLite. Manage feature flags, rollout strategies, and A/B tests." />
+
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/files/logo.svg" />
     <link rel="icon" type="image/x-icon" href="/files/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/files/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/files/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/files/apple-touch-icon.png" />
     <link rel="manifest" href="/files/site.webmanifest" />
+
+    <!-- Open Graph (Social Media) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bandeira" />
+    <meta property="og:title" content="Bandeira — Open-Source Feature Flag Service" />
+    <meta property="og:description" content="Self-hosted feature flag management. Ships as a single binary with SQLite. Manage feature flags, rollout strategies, and A/B tests." />
+    <meta property="og:image" content="/files/og-image.png" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Bandeira — Open-Source Feature Flag Service" />
+    <meta name="twitter:description" content="Self-hosted feature flag management. Ships as a single binary with SQLite. Manage feature flags, rollout strategies, and A/B tests." />
+    <meta name="twitter:image" content="/files/og-image.png" />
+
     {{ .inertiaHead }} {{ viteReactRefresh }} {{ vite "resources/js/app.jsx" }}
   </head>
 

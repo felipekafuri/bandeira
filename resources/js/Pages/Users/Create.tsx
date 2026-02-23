@@ -1,4 +1,4 @@
-import { Link, useForm, usePage } from "@inertiajs/react";
+import { Head, Link, useForm, usePage } from "@inertiajs/react";
 import { FormEventHandler } from "react";
 import TerminalLayout from "@/Layouts/TerminalLayout";
 import { Input } from "@/components/ui/input";
@@ -29,10 +29,12 @@ export default function Create() {
   };
 
   return (
-    <TerminalLayout activePage="users">
-      <div className="max-w-2xl">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+    <>
+      <Head title="New User" />
+      <TerminalLayout activePage="users">
+        <div className="max-w-2xl">
+          <div className="mb-8">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {">"} add_user
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
@@ -137,6 +139,7 @@ export default function Create() {
           </form>
         </div>
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

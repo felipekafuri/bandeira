@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, usePage } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { SharedProps } from "@/types/global";
 import { FeatureFlagToggle } from "@/components/ui/feature-flag-toggle";
 import { AnimateInView, AnimateChild } from "@/components/ui/animate-in-view";
@@ -229,8 +229,10 @@ export default function Home() {
   const { auth } = usePage<SharedProps>().props;
 
   return (
-    <PublicLayout>
-      {/* Terminal Hero */}
+    <>
+      <Head title="Open-Source Feature Flags" />
+      <PublicLayout>
+        {/* Terminal Hero */}
       <section className="relative py-24 md:py-32 px-4 md:px-6 bg-background overflow-hidden">
         {/* Floating shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -527,6 +529,7 @@ export default function Home() {
           </Link>
         </div>
       </AnimateInView>
-    </PublicLayout>
+      </PublicLayout>
+    </>
   );
 }

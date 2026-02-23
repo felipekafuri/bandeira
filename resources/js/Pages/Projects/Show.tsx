@@ -1,4 +1,4 @@
-import { Link, usePage, router } from "@inertiajs/react";
+import { Head, Link, usePage, router } from "@inertiajs/react";
 import { useState, useCallback } from "react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
@@ -134,9 +134,11 @@ export default function Show() {
     project.flags.length > 0 && project.environments.length > 0;
 
   return (
-    <TerminalLayout activePage="projects">
-      <div className="max-w-6xl">
-        {/* Back link */}
+    <>
+      <Head title={project.name} />
+      <TerminalLayout activePage="projects">
+        <div className="max-w-6xl">
+          {/* Back link */}
         <Link
           href="/projects"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
@@ -429,6 +431,7 @@ export default function Show() {
           </div>
         </div>
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }

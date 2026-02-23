@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Head } from "@inertiajs/react";
 import PublicLayout from "@/Layouts/PublicLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -863,8 +864,10 @@ function Playground() {
 
 export default function Strategies() {
   return (
-    <PublicLayout activePage="strategies">
-      <div className="pt-8 pb-16 px-4 md:px-6">
+    <>
+      <Head title="Strategies" />
+      <PublicLayout activePage="strategies">
+        <div className="pt-8 pb-16 px-4 md:px-6">
         <div className="mx-auto max-w-4xl">
           {/* Header */}
           <div className="mb-8">
@@ -1023,6 +1026,7 @@ if client.IsEnabled("new-checkout") {
           // bandeira — open source feature flag management
         </p>
       </footer>
-    </PublicLayout>
+      </PublicLayout>
+    </>
   );
 }

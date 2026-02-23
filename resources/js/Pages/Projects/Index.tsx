@@ -1,4 +1,4 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { SharedProps } from "@/types/global";
 import TerminalLayout from "@/Layouts/TerminalLayout";
 
@@ -20,9 +20,11 @@ export default function Index() {
   const canMutate = auth?.user?.role === "admin" || auth?.user?.role === "editor";
 
   return (
-    <TerminalLayout activePage="projects">
-      <div className="max-w-5xl">
-        {/* Page heading */}
+    <>
+      <Head title="Projects" />
+      <TerminalLayout activePage="projects">
+        <div className="max-w-5xl">
+          {/* Page heading */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-xl font-semibold text-foreground">
@@ -89,6 +91,7 @@ export default function Index() {
           </div>
         )}
       </div>
-    </TerminalLayout>
+      </TerminalLayout>
+    </>
   );
 }
